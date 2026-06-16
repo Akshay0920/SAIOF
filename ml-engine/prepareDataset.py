@@ -234,6 +234,16 @@ class DataPreparationPipeline:
         traffic_imp_rows = [f"| **{feat}** | {imp:.4f} |" for feat, imp in sorted(importances['traffic'].items(), key=lambda x: x[1], reverse=True)]
         cache_imp_rows = [f"| **{feat}** | {imp:.4f} |" for feat, imp in sorted(importances['cache'].items(), key=lambda x: x[1], reverse=True)]
         latency_imp_rows = [f"| **{feat}** | {imp:.4f} |" for feat, imp in sorted(importances['latency'].items(), key=lambda x: x[1], reverse=True)]
+        data_dir_url = self.data_dir.replace("\\", "/")
+        plots_dir_url = self.plots_dir.replace("\\", "/")
+
+        stats_rows_md = "\n".join(stats_rows)
+        missing_rows_md = "\n".join(missing_rows)
+        outlier_rows_md = "\n".join(outlier_rows)
+
+        traffic_imp_rows_md = "\n".join(traffic_imp_rows)
+        cache_imp_rows_md = "\n".join(cache_imp_rows)
+        latency_imp_rows_md = "\n".join(latency_imp_rows)
 
         report_content = f"""# SAIOF ML Telemetry Data Preparation & Diagnostics Report
 
@@ -252,7 +262,7 @@ This diagnostic data preparation report summarizes feature engineering, dataset 
 
 | Feature Column | Type | Observations | Mean | Min | Median (p50) | Max |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-{"\n".join(stats_rows)}
+{stats_rows_md}
 
 ---
 
@@ -260,7 +270,7 @@ This diagnostic data preparation report summarizes feature engineering, dataset 
 
 | Feature Column | Null Count | Null Ratio |
 | :--- | :---: | :---: |
-{"\n".join(missing_rows)}
+{missing_rows_md}
 
 ---
 
@@ -270,7 +280,7 @@ Outliers are evaluated using the standard Q1/Q3 Interquartile Range boundary: `[
 
 | Feature Column | Lower Bound | Upper Bound | Outlier Count | Outlier Ratio |
 | :--- | :---: | :---: | :---: | :---: |
-{"\n".join(outlier_rows)}
+{outlier_rows_md}
 
 ---
 
@@ -279,17 +289,17 @@ Outliers are evaluated using the standard Q1/Q3 Interquartile Range boundary: `[
 ### 1. Traffic Prediction Model (Target: `requestCount`)
 | Feature Name | Relative Importance Coefficient |
 | :--- | :---: |
-{"\n".join(traffic_imp_rows)}
+{traffic_imp_rows_md}
 
 ### 2. Cache Demand Model (Target: `cacheHitRatio`)
 | Feature Name | Relative Importance Coefficient |
 | :--- | :---: |
-{"\n".join(cache_imp_rows)}
+{cache_imp_rows_md}
 
 ### 3. Latency Bottleneck Model (Target: `averageLatency`)
 | Feature Name | Relative Importance Coefficient |
 | :--- | :---: |
-{"\n".join(latency_imp_rows)}
+{latency_imp_rows_md}
 
 ---
 
@@ -297,14 +307,14 @@ Outliers are evaluated using the standard Q1/Q3 Interquartile Range boundary: `[
 
 The processed and engineered sub-datasets have been successfully serialized for model training:
 
-1. **Traffic Prediction**: [traffic_processed.csv](file:///{self.data_dir.replace('\\', '/')}/traffic_processed.csv)
-2. **Latency Prediction**: [latency_processed.csv](file:///{self.data_dir.replace('\\', '/')}/latency_processed.csv)
-3. **Cache Demand Prediction**: [cache_processed.csv](file:///{self.data_dir.replace('\\', '/')}/cache_processed.csv)
+1. **Traffic Prediction**: [traffic_processed.csv](file:///{data_dir_url}/traffic_processed.csv)
+2. **Latency Prediction**: [latency_processed.csv](file:///{data_dir_url}/latency_processed.csv)
+3. **Cache Demand Prediction**: [cache_processed.csv](file:///{data_dir_url}/cache_processed.csv)
 
 Visual analytics compiled:
-* [Correlation Heatmap Matrix](file:///{self.plots_dir.replace('\\', '/')}/correlation_matrix.png)
-* [Feature Importances Spline](file:///{self.plots_dir.replace('\\', '/')}/feature_importance_latency.png)
-* [Diurnal Load Seasonality splines](file:///{self.plots_dir.replace('\\', '/')}/hourly_load_seasonality.png)
+* [Correlation Heatmap Matrix](file:///{plots_dir_url}/correlation_matrix.png)
+* [Feature Importances Spline](file:///{plots_dir_url}/feature_importance_latency.png)
+* [Diurnal Load Seasonality splines](file:///{plots_dir_url}/hourly_load_seasonality.png)
 """
         with open(report_path, "w", encoding="utf-8") as f:
             f.write(report_content)

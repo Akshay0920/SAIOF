@@ -14,15 +14,13 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkDbHealth = async () => {
       try {
-        const res = await apiClient.get('/health');
-        if (res.data && res.data.database === 'DISCONNECTED') {
-          setIsDbOffline(true);
-        } else {
-          setIsDbOffline(false);
-        }
-      } catch (err) {
-        setIsDbOffline(true);
-      }
+  const res = await apiClient.get('/health');
+  console.log('Health Check:', res.data);
+  setIsDbOffline(false);
+} catch (err) {
+  console.error('Health Check Failed:', err);
+  setIsDbOffline(true);
+}
     };
 
     checkDbHealth();
